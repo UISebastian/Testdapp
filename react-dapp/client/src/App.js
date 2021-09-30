@@ -5,11 +5,11 @@ import getWeb3 from "./getWeb3";
 import "./App.css";
 
 class App extends Component {
-  state = { storageValue: "", web3: null, accounts: null, contract: null, newValue:"" };
+  state = { storageValue: "cookies", web3: null, accounts: null, contract: null, newValue:"" };
 
   componentDidMount = async () => {
     try {
-
+      console.log(this.state.storageValue);
       this.handleInputChange= this.handleInputChange.bind(this);
       this.handleSubmit= this.handleSubmit.bind(this);
       // Get network provider and web3 instance.
@@ -45,10 +45,18 @@ class App extends Component {
   async handleSubmit(event){
     event.preventDefault();
 
+
     const {accounts, contract} =this.state;
-    await contract.set(this.state.newValue,{from: accounts[0]});
-    const response = await contract.get();
-    this.setState({storageValue: response});
+
+    try{
+
+      await contract.methods.set(this.state.newValue).send({from: accounts[0]});
+      const response = await contract.methods.get().call();
+      this.setState({storageValue: response});
+
+    } catch (e) {
+      console.log(e);
+    }
   }
 
   runExample = async () => {
